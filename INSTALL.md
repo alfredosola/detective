@@ -7,7 +7,7 @@ See [README.md](https://github.com/alfredosola/detective/blob/master/README.md).
 Commands in this file are tested on a Debian 11 system. They should work on Ubuntu and other derivatives too, and on many other distributions with little adaptations.
 
 ### Install required libraries and stuff
-Detective needs the Python 3 yaml, redis, geoip2 and geopy libraries, plus MaxMind's GeoIP basic kit.
+Detective needs the Python 3 yaml, redis, geoip2 and geopy libraries, plus MaxMind's GeoIP basic kit, and a Redis server.
 
 On a Debian system, this is done with a one-liner:
 

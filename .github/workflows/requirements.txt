@@ -1,0 +1,4 @@
+yaml
+redis
+geoip2
+geopy
