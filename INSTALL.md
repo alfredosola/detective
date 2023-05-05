@@ -141,4 +141,4 @@ Please see the Contributions section of the [README.md](https://github.com/alfre
 
 ## License
 
-Detective is licensed under the GNU General Public License v3.0. See [LICENSE.md](https://github.com/alfredosola/detective/blob/master/LICENSE.md).
+Detective is licensed under the GNU General Public License v3.0. See [LICENSE](https://github.com/alfredosola/detective/blob/master/LICENSE).
