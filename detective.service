@@ -1,0 +1,11 @@
+[Unit]
+Description=Detective
+After=rsyslog.service
+
+[Service]
+Type=simple
+WorkingDirectory=/etc
+ExecStart=/usr/local/bin/detective.py
+
+[Install]
+WantedBy=multi-user.target
