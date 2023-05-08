@@ -40,8 +40,8 @@ logging.basicConfig(level=logging.INFO, format='%(message)s', datefmt='', filena
 
 class reParser(object):
   def parse(self, object):
-    regex_dovecot_login = re.compile(r"dovecot: imap-login: Login: user=<(?P<email>[\w.]+@[\w.]+)>.+rip=(?P<ip>\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})")
-    regex_smtpd_login = re.compile(r"postfix/smtpd.+client=.+\[(?P<ip>\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})\].+sasl_username=(?P<email>[\w.]+@[\w.]+)")
+    regex_dovecot_login = re.compile(r"dovecot: imap-login: Login: user=<(?P<email>[\w.]+@[\w.]+)>.+rip=(?P<ip>(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|(?:(?:[0-9A-Fa-f]{1,4}):){7}(?:[0-9A-Fa-f]{1,4})),")
+    regex_smtpd_login = re.compile(r"postfix/smtpd.+client=.+\[(?P<ip>(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|(?:(?:[0-9A-Fa-f]{1,4}):){7}(?:[0-9A-Fa-f]{1,4}))\],.+sasl_username=(?P<email>[\w.]+@[\w.]+)")
     payload              = {}
 
     m = regex_dovecot_login.search(object)
@@ -70,6 +70,10 @@ class SyslogUDPHandler(socketserver.BaseRequestHandler):
     socket = self.request[1]
     fields = reparser.parse(data)
     if ( fields != {} ):
+      logging.debug(str(datetime.datetime.now()) + " Decoded: " +
+        " service: " + fields["service"] +
+        " email: " + fields["email"] +
+        " IP: " + fields["ip"] )
       with geoip2.database.Reader('/var/lib/GeoIP/GeoLite2-City.mmdb') as reader:
         geolocation = reader.city(fields["ip"])
       previous_action = r.hmget( fields["email"], "timestamp", "ip", "latitude", "longitude", "iso_code", "accuracy", "service" )
@@ -92,7 +96,15 @@ class SyslogUDPHandler(socketserver.BaseRequestHandler):
               logging.info(str(datetime.datetime.now()) + " Red alert: " + fields["email"] + " came from " + previous_ip + " at " + str(previous_timestamp) + ", now from " + fields["ip"] + " (" + geolocation.country.iso_code + "), distance: " + str(round(distance/1000)) + " km, time " + str(time_difference) + ", speed " + str(round(speed)) + " m/s")
             else:
               logging.info(str(datetime.datetime.now()) + " Yellow alert: " + fields["email"] + " came from " + previous_ip + " at " + str(previous_timestamp) + ", now from " + fields["ip"] + " (" + geolocation.country.iso_code + "), distance: " + str(round(distance/1000)) + " km, time " + str(time_difference) + ", speed " + str(round(speed)) + " m/s")
-      r.hmset( fields["email"], {"timestamp": str(datetime.datetime.now()), "ip": fields["ip"], "latitude": geolocation.location.latitude, "longitude": geolocation.location.longitude, "iso_code": geolocation.registered_country.iso_code, "accuracy": geolocation.location.accuracy_radius, "service": fields["service"] } )
+      try:
+        key = fields["email"]
+        iso_code = geolocation.registered_country.iso_code if geolocation.registered_country.iso_code is not None else "--"
+        content = { "timestamp": str(datetime.datetime.now()), "ip": fields["ip"],
+                    "latitude": geolocation.location.latitude, "longitude": geolocation.location.longitude,
+                    "iso_code": iso_code, "accuracy": geolocation.location.accuracy_radius, "service": fields["service"] }
+        r.hmset( key, content )
+      except:
+        logging.info(str(datetime.datetime.now()) + " Exception sending to Redis: " + str(content))
 
 if __name__ == "__main__":
   try:
