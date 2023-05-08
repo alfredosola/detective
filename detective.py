@@ -25,6 +25,8 @@ HOST, PORT = "127.0.0.1", 10514
 LOGFILE = '/var/log/detective.log'
 DISTANCEMARGIN = 100000 # m. Two IPs geolocated within this distance are considered to be in the same place. Default 100 km.
 SPEEDMARGIN = 1000 # m/s. Two logins separated this distance/time are considered fine. Default 1000 m/s, about thrice the speed of sound.
+DISTANCEMARGINWITHINCOUNTRY = 200000 # m. Two IPs geolocated within this distance are considered to be in the same place if CC is the same. Default 200 km.
+SPEEDMARGINWITHINCOUNTRY = 2000 # m/s. Two logins separated this distance/time are considered fine if CC is the same. Default 2000 m/s.
 SUSPICIOUSCC = ['CN', 'RU']
 
 import re
@@ -91,11 +93,15 @@ class SyslogUDPHandler(socketserver.BaseRequestHandler):
           speed = distance / time_difference.total_seconds()
           logging.debug(str(datetime.datetime.now()) + " Gray alert: " + fields["email"] + " came from " + previous_ip + " at " + str(previous_timestamp) + ", now from " + fields["ip"] + ", distance: " + str(round(distance/1000)) + " km, time " + str(time_difference) + ", speed " + str(round(speed)) + " m/s")
           # Now it gets interesting
-          if ( distance > DISTANCEMARGIN and speed > SPEEDMARGIN ):
+          if ( ( distance > DISTANCEMARGINWITHINCOUNTRY and speed > SPEEDMARGINWITHINCOUNTRY and previous_country == geolocation.registered_country.iso_code ) or
+               ( distance > DISTANCEMARGIN and speed > SPEEDMARGIN and previous_country != geolocation.registered_country.iso_code ) ):
+            log_data = fields["email"] + " came from " + previous_ip + " (" + previous_country + "), at " + str(previous_timestamp) + \
+                                         ", now from " + fields["ip"] + " (" + geolocation.country.iso_code + "), distance: " + \
+                                         str(round(distance/1000)) + " km, time " + str(time_difference) + ", speed " + str(round(speed)) + " m/s"
             if ( geolocation.country.iso_code in SUSPICIOUSCC ):
-              logging.info(str(datetime.datetime.now()) + " Red alert: " + fields["email"] + " came from " + previous_ip + " at " + str(previous_timestamp) + ", now from " + fields["ip"] + " (" + geolocation.country.iso_code + "), distance: " + str(round(distance/1000)) + " km, time " + str(time_difference) + ", speed " + str(round(speed)) + " m/s")
+              logging.info(str(datetime.datetime.now()) + " Red alert: " + log_data)
             else:
-              logging.info(str(datetime.datetime.now()) + " Yellow alert: " + fields["email"] + " came from " + previous_ip + " at " + str(previous_timestamp) + ", now from " + fields["ip"] + " (" + geolocation.country.iso_code + "), distance: " + str(round(distance/1000)) + " km, time " + str(time_difference) + ", speed " + str(round(speed)) + " m/s")
+              logging.info(str(datetime.datetime.now()) + " Yellow alert: " + log_data)
       try:
         key = fields["email"]
         iso_code = geolocation.registered_country.iso_code if geolocation.registered_country.iso_code is not None else "--"
