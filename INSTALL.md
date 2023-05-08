@@ -7,7 +7,7 @@ See [README.md](https://github.com/alfredosola/detective/blob/master/README.md).
 Commands in this file are tested on a Debian 11 system. They should work on Ubuntu and other derivatives too, and on many other distributions with little adaptations.
 
 ### Install required libraries and stuff
-Detective needs the Python 3 yaml, redis, geoip2 and geopy libraries, plus MaxMind's GeoIP basic kit, and a Redis server.
+Detective needs the Python 3 yaml, redis, geoip2 and geopy libraries, plus MaxMind's GeoLite2 Free Geolocation Data (or better), and a Redis server.
 
 On a Debian system, this is done with a one-liner:
 
@@ -16,7 +16,7 @@ sudo apt --yes install python3 python3-yaml python3-redis redis-server python3-g
 ```
 
 ### Configure GeoIP
-You need a Maxmind accout (a free one is enough for our purposes) to keep the IP geolocation database current.
+You need a Maxmind accout to keep the IP geolocation database current. The free of charge Geolite2 is enough for Detective.
 
 Edit `/etc/GeoIP.conf` and set your AccountID and LicenseKey.
 

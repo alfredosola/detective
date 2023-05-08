@@ -4,17 +4,17 @@ Follow Tecnocrática on Twitter: [@TecnocraticaCPD](https://twitter.com/Tecnocra
 
 ## Why?
 
-The CEO scam. The new bank account scam. Many of today's most successful and insidious threats come by email after a breach of someone's e-mail.
+The CEO scam. The new bank account scam. Many of today's most successful and insidious threats come in the form of a legitimate-looking e-mail, after a breach of someone's e-mail.
 
-In many of those, the attackers log in to the victim's e-mail well in advance of the execution of their attack. They usually do it from somewhere far from the legitimate user, like a VPN or a residential connection in a far away country. And that is detectable automatically. Why not keep watch for that?
+In many of those, the attackers log in to the victim's (or the victim's business partner) e-mail well in advance of the execution of their attack. They usually do it from somewhere far from the legitimate user, like a VPN or a residential connection in a far away country. And that situation can be detected automatically. Why not keep watch for that?
 
 ## What?
 
-This is a small utility that sits in the background ingesting mail logs and will raise an alarm when something concerning happens. Concerning, in this case, means a very likely (aiming for 100% accuracy) breach of a user's e-mail account security.
+The Log Detective (or Detective for short) is a small utility that sits in the background ingesting mail logs and will raise an alarm when something concerning happens. Concerning, in this case, means a very likely (aiming for 100% accuracy) breach of a user's e-mail account security.
 
 ## How?
 
-With a syslog listener that decodes Postfix SASL and Dovecot IMAP logins in real time. Then, it finds and geolocates its IP addresses. When the IP has changed, it calculates the physical distance between the previous action and the current one. If it finds two actions that happen impossible in space-time, like logging in from cities thousands of kilometers away within minutes, it raises an alarm.
+Detective has a syslog listener that decodes Postfix SASL and Dovecot IMAP logins in real time. Then, it finds and geolocates its IP addresses. When the IP has changed, it calculates the physical distance between the previous action and the current one. If it finds two actions that happen impossible in space-time, like logging in from cities thousands of kilometers away within minutes, it raises an alarm.
 
 Using MaxMind's GeoIP City database (an account is required, a free account is enough for this purpose) and a simple Python program that can be fed directly from syslog. See INSTALL.md for details.
 
@@ -24,7 +24,7 @@ Optionally, a more severe alarm is raised if one of the IP addresses is geolocat
 
 ## Who?
 
-This was made for [Tecnocrática](https://tecnocratica.net) by one of its founders, hoping to contribute back to the community.
+This was originally written for using in [Tecnocrática](https://tecnocratica.net) by one of its founders. I am hoping to contribute back to the community.
 
 ## False positives
 
@@ -60,6 +60,8 @@ Areas where contributions are regarded to be especially useful:
 - Packaging for distributions.
 - Use cases
 
+That said, no contribution is too minor to be reviewed and hopefully accepted. Even a typo!
+
 ## License
 
-Detective is licensed under the GNU General Public License v3.0. See [LICENSE](https://github.com/alfredosola/detective/blob/master/LICENSE).
+The Log Detective is licensed under the GNU General Public License v3.0. See [LICENSE](https://github.com/alfredosola/detective/blob/master/LICENSE).
