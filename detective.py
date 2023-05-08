@@ -36,7 +36,7 @@ import socketserver
 import geoip2.database
 from geopy.distance import geodesic
 
-logging.basicConfig(level=logging.DEBUG, format='%(message)s', datefmt='', filename=LOGFILE, filemode='a')
+logging.basicConfig(level=logging.INFO, format='%(message)s', datefmt='', filename=LOGFILE, filemode='a')
 
 class reParser(object):
   def parse(self, object):
@@ -89,9 +89,9 @@ class SyslogUDPHandler(socketserver.BaseRequestHandler):
           # Now it gets interesting
           if ( distance > DISTANCEMARGIN and speed > SPEEDMARGIN ):
             if ( geolocation.country.iso_code in SUSPICIOUSCC ):
-              logging.info(str(datetime.datetime.now()) + " Yellow alert: " + fields["email"] + " came from " + previous_ip + " at " + str(previous_timestamp) + ", now from " + fields["ip"] + " (" + geolocation.country.iso_code + "), distance: " + str(round(distance/1000)) + " km, time " + str(time_difference) + ", speed " + str(round(speed)) + " m/s")
-            else:
               logging.info(str(datetime.datetime.now()) + " Red alert: " + fields["email"] + " came from " + previous_ip + " at " + str(previous_timestamp) + ", now from " + fields["ip"] + " (" + geolocation.country.iso_code + "), distance: " + str(round(distance/1000)) + " km, time " + str(time_difference) + ", speed " + str(round(speed)) + " m/s")
+            else:
+              logging.info(str(datetime.datetime.now()) + " Yellow alert: " + fields["email"] + " came from " + previous_ip + " at " + str(previous_timestamp) + ", now from " + fields["ip"] + " (" + geolocation.country.iso_code + "), distance: " + str(round(distance/1000)) + " km, time " + str(time_difference) + ", speed " + str(round(speed)) + " m/s")
       r.hmset( fields["email"], {"timestamp": str(datetime.datetime.now()), "ip": fields["ip"], "latitude": geolocation.location.latitude, "longitude": geolocation.location.longitude, "iso_code": geolocation.registered_country.iso_code, "accuracy": geolocation.location.accuracy_radius, "service": fields["service"] } )
 
 if __name__ == "__main__":
