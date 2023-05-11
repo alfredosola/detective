@@ -45,7 +45,12 @@ See [INSTALL.md](https://github.com/alfredosola/detective/blob/master/INSTALL.md
 | LOGFILE        | Write events to this log file.                                                                 | /var/log/detective.log           |
 | DISTANCEMARGIN | Two IPs geolocated within this distance are considered to be in the same place.                | 100 km                           |
 | SPEEDMARGIN    | Two logins separated this distance/time are considered fine.                                   | 1000 m/s (about thrice the speed of sound) |
-| SUSPICIOUSCC   | Countries (in ISO 3166 2-letter format) where we believe none of our users are or log in from  | ['CN', 'RU']                     |
+| SUSPICIOUSCC   | Countries (in ISO 3166 2-letter format) where we believe none of our users are or log in from. | ['CN', 'RU']                     |
+| EMAILALLOWLIST | Do not generate alerts for the emails in this file.                                            | /etc/detective/emailallowlist.txt|
+| NETALLOWLIST   | Do not generate alerts for the IPs contained in the networks in this file                      | /etc/detective/netallowlist.txt  |
+| DISTANCEMARGINWITHINCOUNTRY | Same as DISTANCEMARGIN, but if the country is the same for both | 500 km. |
+| SPEEDMARGINWITHINCOUNTRY | SAME AS SPEEDMARGIN, but if the country is the same for both | 2000 m/s. |
+| SAMECCISGRAY   | IPs located in the same country will raise gray alerts at most, i.e., override the WITHINCOUNTRY parameters. Useful for false positive reduction. | True |
 
 ## Issues, bug reports, feedback
 
