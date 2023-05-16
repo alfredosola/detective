@@ -75,20 +75,18 @@ class SyslogUDPHandler(socketserver.BaseRequestHandler):
       except ipaddress.AddressValueError:
         raise ValueError('Invalid IP address format')
     try:
+      network_addresses = []
       with open(NETALLOWLIST, 'r') as f:
-        networks = f.read().splitlines()
+        for line in f:
+          line = line.strip()
+        if ( line and not line.startswith('#') ):
+          try:
+            network_address = ipaddress.ip_network(line, strict=False)
+            network_addresses.append(network_address)
+          except ValueError:
+           logging.warning(str(datetime.datetime.now()) + " Invalid network format and not a comment: {line}")
     except FileNotFoundError:
       return False
-    network_addresses = []
-    for network in networks:
-      try:
-        network_address = ipaddress.IPv4Network(network)
-      except ipaddress.AddressValueError:
-         try:
-            network_address = ipaddress.IPv6Network(network)
-         except ipaddress.AddressValueError:
-            raise ValueError(f'Invalid network format: {network}')
-      network_addresses.append(network_address)
 
     for network_address in network_addresses:
       if ip_address in network_address:
